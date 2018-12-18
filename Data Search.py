@@ -1,7 +1,10 @@
-import matplotlib as plt
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import statistics
 import csv
+import collections as counter
+
 
 
 filename = 'pokemon_alopez247.csv'
@@ -9,46 +12,58 @@ with open(filename) as f:
     reader = csv.reader(f)
     header_row = next(reader)
     #print(header_row)
-    high_atk = [ ]
+    atk = []
     for row in reader:
-        atk = int(row[6])
-        high_atk.append(atk)
+        atk.append(int(row[6]))
     #print(high_atk)
-    high_spatk = []
+    SP = []
     for row in reader:
-        SP = int(row[8])
-        high_spatk.append(SP)
+        SP.append(int(row[8]))
     #print(high_spatk)
 
 minatk = []
-minatk.append(min(high_atk))
+minatk.append(min(atk))
 #print(minatk)
 maxatk = []
-maxatk.append(max(high_atk))
+maxatk.append(min(atk))
 #print(maxatk)
-averageatk = []
-averageatk.append(round(statistics.mean(high_atk)))
+#averageatk = []
+#averageatk.append(round(statistics.mean(atk)))
 #print(averageatk)
 minsp = []
-minsp.append(min(high_spatk))
+minsp.append(min(SP))
 maxsp = []
-maxsp.append(max(high_spatk))
-averagesp = []
-averagesp.append(round(statistics.mean(high_spatk)))
+maxsp.append(min(SP))
 
-N = 3
-ind = np.arange(N)
+#averagesp = []
+#averagesp.append(round(statistics.mean(SP)))
+
+ind = np.arange(len(atk))
 width = 0.45
 
-p1 = plt.bar(ind, minatk, width, yerr=maxatk)
-p2 = plt.bar(ind, minsp, width, bottom=minatk, yerr=maxsp)
-p3 = plt.bar(ind, averageatk, width, bottom=averagesp)
+fig, ax = plt.subplots( )
+rects1 = ax.bar(ind - width/2, maxatk, width, yerr=minatk,
+                color='red', label='atk')
+rects2 = ax.bar(ind - width/2, maxsp, width, yerr=minsp, color='yellow')
+#rects3 = ax.bar(ind - width/2, averageatk, width, yerr=averagesp,
+                #color='blue')
 
-plt.ylabel('atk / sp_atk Power')
-plt.title('The minimal, maximum, and average atk/sp_atk of all pokemon')
-plt.xticks(ind, ('Max', 'Min', 'Average'))
-plt.yticks(np.arange(0, 80, 5))
-plt.legend((p1[0], p2[0], p3[0]), ('Atk', 'SP_Atk'))
+ax.set_ylabel('power level')
+ax.set_title('Pokemon atk and spatk')
+ax.set_xticks(ind)
+ax.set_xticklabels(('max', 'min'))
+ax.legend()
+
+def autolabel(rects, xpos='center'):
+    xpos = xpos.lower()
+    ha = {'center': 'center', 'right':'left', 'left':'right'}
+    offset = {'center': 0.5, 'right': 0.57, 'left': 0.43}
+    for rect in rects:
+        height = rect.getheight()
+        ax.text(rect.get_x() + rect.get_width()*offset[xpos], 1.01*height, '{}'.format(height), ha=ha[xpos], va='bottom')
+
+autolabel(rects1, 'left')
+autolabel(rects2, 'right')
+#autolabel(rects3, 'left')
 
 plt.show()
-
